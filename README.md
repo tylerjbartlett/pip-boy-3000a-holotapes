@@ -21,7 +21,7 @@
     </a>&nbsp;|&nbsp;
     <a href="https://www.espruino.com" target="_blank">
       Espruino
-    </a>|&nbsp;
+    </a>&nbsp;|&nbsp;
     <a href="https://log.robco-industries.org/" target="_blank">
       RobCo Industries
     </a>
