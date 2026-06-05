@@ -4,7 +4,7 @@
   "author": "@CodyTolene",
   "version": "1.0.0",
   "description": "iPip Media Player app for the new Pip-Boy 3000.",
-  "icon": "assets/ipip.png",
+  "icon": "assets/iPip.png",
   "previews": [],
   "type": "app",
   "readme": "README.md",
