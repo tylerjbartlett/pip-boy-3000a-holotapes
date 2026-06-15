@@ -457,9 +457,11 @@
   }
 
   function onPress(e) {
-    // Stamp the click time on BOTH edges so the spurious knob rotation the
-    // physical click generates always lands inside the ignore window in
-    // onKnob1 (whether it fires just before or just after the press).
+    // This fixes the issue where the knob press also moves the cursor up after
+    // click. The stray rotation actually fires as you release the knob, so we
+    // watch both edges and re-stamp lastClickTime on release too, keeping it
+    // inside onKnob1's ignore window. This early return handles that release
+    // edge: refresh the time, then bail so the select doesn't run twice.
     lastClickTime = Date.now();
     if (e && !e.state) return;
     if (phase === 'title') {
