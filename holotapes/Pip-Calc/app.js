@@ -5,8 +5,7 @@
 //  Repository: https://github.com/tylerjbartlett/pip-boy-3000a-holotapes
 // =============================================================================
 
-// TODO: want to remove double wide clear button and add a delete button.
-//       assess the 10 character display limit
+// TODO: assess the 10 character display limit
 
 (function () {
   // General variables
@@ -21,6 +20,7 @@
     DISP_Y: 8,
     DISP_W: W - 32,
     DISP_H: 52,
+    DISP_MAX_CHARS: 24,
     GRID_X: 16,
     GRID_Y: 68,
     BTN_GAP: 4,
@@ -31,11 +31,11 @@
 
   // prettier-ignore
   const BTNS = [
-    '7', '8', '9', '/',
-    '4', '5', '6', '*',
-    '1', '2', '3', '-',
-    '0', '.', '=', '+',
-    'CLR', '', '(', ')',
+    '(', ')', '*', '/',
+    '7', '8', '9', '-',
+    '4', '5', '6', '+',
+    '1', '2', '3', '=',
+    '0', '.', 'DEL', 'CLR',
   ];
 
   // Store original device settings to restore on exit
@@ -46,23 +46,22 @@
   let justEvaluated = false;
   let selectedCol = 0;
   let selectedRow = 0;
-  let lastRow4Col = 0; // remembers which column we approached row 4 from
   let dirtyDisplay = 1;
   let dirtyCells = []; // list of {col, row} cells needing redraw
 
   function markDirty(col, row) {
-    if (row === 4 && col === 1) col = 0; // redirect to the spanning C button
     dirtyCells.push({ col: col, row: row });
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
   function getButtonLabel(col, row) {
-    if (row === 4 && col === 1) return 'C'; // C button spans col 0–1
     return BTNS[row * 4 + col] || '';
   }
 
   function trimDisplay(s) {
-    return s.length > 10 ? s.slice(s.length - 10) : s;
+    return s.length > C.DISP_MAX_CHARS
+      ? s.slice(s.length - C.DISP_MAX_CHARS)
+      : s;
   }
 
   function evaluateExpression(s) {
@@ -99,39 +98,31 @@
   }
 
   function drawButton(col, row) {
-    if (row === 4 && col === 1) return; // covered by the spanned C button
-
     const label = getButtonLabel(col, row);
     if (label === '') return;
 
-    const isClearSpan = row === 4 && col === 0;
-    const spanCols = isClearSpan ? 2 : 1;
-
     const buttonX = C.GRID_X + col * (C.BTN_W + C.BTN_GAP);
     const buttonY = C.GRID_Y + row * (C.BTN_H + C.BTN_GAP);
-    const buttonW = C.BTN_W * spanCols + C.BTN_GAP * (spanCols - 1);
-    const isSelected =
-      row === selectedRow &&
-      (col === selectedCol || (isClearSpan && selectedCol === 1));
+    const isSelected = col === selectedCol && row === selectedRow;
 
-    h.clearRect(buttonX, buttonY, buttonX + buttonW - 1, buttonY + C.BTN_H - 1);
-    h.drawRect(buttonX, buttonY, buttonX + buttonW - 1, buttonY + C.BTN_H - 1);
+    h.clearRect(buttonX, buttonY, buttonX + C.BTN_W - 1, buttonY + C.BTN_H - 1);
+    h.drawRect(buttonX, buttonY, buttonX + C.BTN_W - 1, buttonY + C.BTN_H - 1);
 
     h.setClipRect(
       buttonX + C.BTN_PAD,
       buttonY + 1,
-      buttonX + buttonW - 1 - C.BTN_PAD,
+      buttonX + C.BTN_W - 1 - C.BTN_PAD,
       buttonY + C.BTN_H - 2,
     );
     h.setFontMonofonto16().setFontAlign(0, 0, 0);
-    h.drawString(label, buttonX + buttonW / 2, buttonY + C.BTN_H / 2);
+    h.drawString(label, buttonX + C.BTN_W / 2, buttonY + C.BTN_H / 2);
     h.setClipRect(0, 0, W - 1, H - 1);
 
     if (isSelected)
       Pip.shadeBox(
         buttonX,
         buttonY,
-        buttonX + buttonW - 1,
+        buttonX + C.BTN_W - 1,
         buttonY + C.BTN_H - 1,
       );
   }
@@ -169,9 +160,16 @@
 
     Pip.playSound('TAB');
 
-    if (label === 'C') {
+    if (label === 'CLR') {
       expression = '0';
       justEvaluated = false;
+    } else if (label === 'DEL') {
+      if (justEvaluated) {
+        expression = '0';
+        justEvaluated = false;
+      } else {
+        expression = expression.length > 1 ? expression.slice(0, -1) : '0';
+      }
     } else if (label === '=') {
       expression = evaluateExpression(expression);
       justEvaluated = true;
@@ -205,24 +203,10 @@
     } else {
       Pip.playSound('SCROLL');
       const previousRow = selectedRow;
-      const previousCol = selectedCol;
-
-      let newRow = previousRow + (dir === 1 ? 1 : -1);
-      if (newRow > 4) newRow = 0;
-      if (newRow < 0) newRow = 4;
-
-      if (previousRow === 4 && newRow !== 4) {
-        // leaving row 4 — restore whichever column we originally came from
-        selectedCol = lastRow4Col;
-      } else if (newRow === 4 && previousRow !== 4) {
-        // arriving at row 4 — remember the column, then snap onto C visually
-        lastRow4Col = selectedCol;
-        if (selectedCol === 1) selectedCol = 0;
-      }
-
-      selectedRow = newRow;
-
-      markDirty(previousCol, previousRow);
+      selectedRow += dir === 1 ? 1 : -1;
+      if (selectedRow > 4) selectedRow = 0;
+      if (selectedRow < 0) selectedRow = 4;
+      markDirty(selectedCol, previousRow);
       markDirty(selectedCol, selectedRow);
       draw();
     }
@@ -235,10 +219,6 @@
     selectedCol += dir === 1 ? 1 : -1;
     if (selectedCol > 3) selectedCol = 0;
     if (selectedCol < 0) selectedCol = 3;
-    if (selectedRow === 4 && selectedCol === 1) {
-      selectedCol += dir === 1 ? 1 : -1; // skip phantom cell covered by C
-    }
-    if (selectedRow === 4) lastRow4Col = selectedCol;
     markDirty(previousCol, selectedRow);
     markDirty(selectedCol, selectedRow);
     draw();
