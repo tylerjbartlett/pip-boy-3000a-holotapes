@@ -5,8 +5,6 @@
 //  Repository: https://github.com/tylerjbartlett/pip-boy-3000a-holotapes
 // =============================================================================
 
-// TODO: assess the 10 character display limit
-
 (function () {
   // General variables
   const APP_NAME = 'PIP-CALC';
