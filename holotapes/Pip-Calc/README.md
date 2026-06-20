@@ -13,11 +13,19 @@
 
 ### Description
 
-A simple calculator for the Pip-Boy.
+A simple calculator app for the Pip-Boy 3000a.
 
 ### Controls
 
-TODO
+- Scroll the front-left wheel (knob1) up/down to move through rows.
+- Scroll the top-right wheel (knob2) left/right to move through columns.
+- Short-press the front-left wheel (knob1) to select the highlighted button.
+- Long-press the front-left wheel (knob1) to clear the current entry.
+
+### AI Usage Disclaimer
+
+This app was developed with assistance from Claude (Anthropic), with code
+reviewed for compliance against this repo's `agents.md` conventions.
 
 ### License(s)
 
