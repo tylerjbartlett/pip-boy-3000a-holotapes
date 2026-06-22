@@ -22,6 +22,11 @@ A simple calculator app for the Pip-Boy 3000a.
 - Short-press the front-left wheel (knob1) to select the highlighted button.
 - Long-press the front-left wheel (knob1) to clear the current entry.
 
+### Notes
+
+- Pip-Calc does not support implicit multiplication. An expression like `2(3+1)`
+  will evaluate to `ERR`. Use an explicit `*` instead, e.g. `2*(3+1)`.
+
 ### AI Usage Disclaimer
 
 This app was developed with assistance from Claude (Anthropic), with code
