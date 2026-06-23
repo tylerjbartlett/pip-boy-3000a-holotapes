@@ -202,7 +202,7 @@
     "storage": [
       {
         "name": "HOLO/KILLTEAM/APP.js",
-        "url": "KillTeamTracker/app.min.js"
+        "url": "KillTeamTracker/app.js"
       }
     ]
   },

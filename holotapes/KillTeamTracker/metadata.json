@@ -9,5 +9,5 @@
   "type": "game",
   "readme": "README.md",
   "custom": "",
-  "storage": [{ "name": "HOLO/KILLTEAM/APP.js", "url": "app.min.js" }]
+  "storage": [{ "name": "HOLO/KILLTEAM/APP.js", "url": "app.js" }]
 }
