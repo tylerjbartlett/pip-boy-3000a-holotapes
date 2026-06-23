@@ -13,7 +13,7 @@
 
 ### Description
 
-A simple calculator app for the Pip-Boy 3000a.
+A simple calculator app for the Pip-Boy 3000.
 
 ### Controls
 
