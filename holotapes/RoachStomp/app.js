@@ -20,7 +20,11 @@
   };
 
   const SFX = {
+    TITLE: '/HOLO/ROACHSTOMP/TITLE.WAV',
     SPLAT: '/HOLO/ROACHSTOMP/SPLAT.WAV',
+    GAMEOVER: '/HOLO/ROACHSTOMP/GAMEOVER.WAV',
+    GRUNT: '/HOLO/ROACHSTOMP/GRUNT.WAV',
+    WHOOSH: '/HOLO/ROACHSTOMP/WHOOSH.WAV',
   };
 
   const MENU_MAIN_OPTIONS = ['EASY', 'MEDIUM', 'HARD'];
@@ -88,8 +92,7 @@
   let marchTimeout = undefined;
   let frameInterval = undefined;
   let gameOverInputDelay = undefined;
-  let staleTimerFires = 0; // diagnostic only — how often a timer fired after teardown
-  let splatSound = undefined;
+  // let staleTimerFires = 0; // diagnostic only — how often a timer fired after teardown
 
   // HELPER FUNCTIONS
   function readAppVersion() {
@@ -123,6 +126,8 @@
   }
 
   function loadAssets() {
+    if (assetsLoaded === true) return;
+
     E.defrag();
     roach1Image = loadImage(FILE_PATHS.ROACH1);
     roach2Image = loadImage(FILE_PATHS.ROACH2);
@@ -132,6 +137,8 @@
     // splat2Image = loadImage(FILE_PATHS.SPLAT2);
     heartFullImage = loadImage(FILE_PATHS.HEARTFULL);
     heartEmptyImage = loadImage(FILE_PATHS.HEARTEMPTY);
+
+    assetsLoaded = true;
   }
 
   // GAME FUNCTIONS
@@ -208,7 +215,7 @@
   function scheduleSpawn(laneIndex) {
     laneSpawnTimeouts[laneIndex] = setTimeout(function () {
       if (frameInterval == null) {
-        staleTimerFires++;
+        // staleTimerFires++;
         return; // not in game, dont schedule a spawn
       }
       if (!lanes[laneIndex]) spawnRoach(laneIndex);
@@ -219,7 +226,7 @@
   function scheduleMarchTick() {
     marchTimeout = setTimeout(function () {
       if (frameInterval == null) {
-        staleTimerFires++;
+        // staleTimerFires++;
         return; // not in game, dont schedule a march
       }
       onMarchTick();
@@ -248,6 +255,7 @@
         if (health <= 0) {
           return;
         }
+        Pip.audioStart(SFX.GRUNT);
       }
     }
   }
@@ -274,6 +282,7 @@
   }
 
   function endGame() {
+    Pip.audioStart(SFX.GAMEOVER);
     Pip.removeListener('knob1', onKnob1_InGame);
     Pip.removeListener('knob2', onKnob2_InGame);
 
@@ -301,11 +310,6 @@
   }
 
   function startGame(difficulty) {
-    if (assetsLoaded === false) {
-      loadAssets();
-      assetsLoaded = true;
-    }
-
     if (difficulty === 'EASY') {
       gameBoard = GAME_BOARD_EASY;
       setLanes(gameBoard[0].length);
@@ -326,25 +330,20 @@
       playerLaneMaxIndex = 6;
     }
 
-    h.clear(1);
-    drawPlayer(playerLaneIndexSelected, playerLaneIndexSelected - 1);
-    updateHealth(GAME_CONSTS.STARTING_HEALTH);
-
-    Pip.onExclusive('knob1', onKnob1_InGame);
-    Pip.onExclusive('knob2', onKnob2_InGame);
-
     frameInterval = setInterval(onGameInterval, 50);
     scheduleMarchTick();
     for (let i = 0; i < lanes.length; i++) scheduleSpawn(i);
 
     h.clear(1);
-
     drawPlayer(playerLaneIndexSelected, playerLaneIndexSelected - 1);
     updateHealth(GAME_CONSTS.STARTING_HEALTH);
     score = 0;
     h.setFontMonofonto16()
       .setFontAlign(-1, -1, 0)
       .drawString('Score: ' + score, 20, 10);
+
+    Pip.onExclusive('knob1', onKnob1_InGame);
+    Pip.onExclusive('knob2', onKnob2_InGame);
   }
 
   function drawGameOverScreen() {
@@ -424,15 +423,6 @@
     Pip.shadeBox(180, selectedY - 30, 300, selectedY + 30);
   }
 
-  function drawLoadingScreen() {
-    h.clear(1);
-
-    h.setColor(3)
-      .setFontMonofonto36()
-      .setFontAlign(0, 0)
-      .drawString('LOADING...', 240, 120);
-  }
-
   function drawTitleStartGame() {
     h.setColor(0).fillRect(165, 257, 315, 290);
     h.setColor(fadeOn ? 3 : 1)
@@ -461,9 +451,19 @@
       .setFontMonofonto18()
       .setFontAlign(1, 1)
       .drawString(APP_VERSION, 160, 115);
-    drawTitleStartGame();
+
+    h.setColor(0).fillRect(165, 257, 315, 290);
+    h.setColor(1)
+      .setFontMonofonto28()
+      .setFontAlign(0, 0)
+      .drawString('Loading...', 240, 275);
+
+    setTimeout(function () {
+      loadAssets();
+    }, 0);
 
     fadeInterval = setInterval(gameStartFade, 1200);
+    Pip.audioStart(SFX.TITLE, { repeat: true });
   }
 
   function onKnob1_InGame(dir) {
@@ -475,6 +475,8 @@
         Pip.audioStart(SFX.SPLAT);
         lanes[playerLaneIndexSelected] = null;
         updateScore(10);
+      } else {
+        Pip.audioStart(SFX.WHOOSH);
       }
     }
   }
@@ -495,15 +497,12 @@
 
     if (dir === 0) {
       Pip.removeListener('knob1', onKnob1_MenuMain);
-
+      Pip.audioStop();
       if (menuIndexSelected === 0) {
-        drawLoadingScreen();
         startGame('EASY');
       } else if (menuIndexSelected === 1) {
-        drawLoadingScreen();
         startGame('MEDIUM');
       } else if (menuIndexSelected === 2) {
-        drawLoadingScreen();
         startGame('HARD');
       }
     } else {
@@ -565,6 +564,7 @@
           }
         }
       }
+      Pip.audioStop();
       Pip.removeListener('knob1', onKnob1_TitleScreen);
       Pip.removeListener('knob1', onKnob1_MenuMain);
       Pip.removeListener('knob1', onKnob1_InGame);
