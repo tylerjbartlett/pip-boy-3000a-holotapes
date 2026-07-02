@@ -44,4 +44,16 @@ licenses.
 [splat 005.wav by yottasounds](https://freesound.org/s/232135/) -- License:
 Creative Commons 0
 
+[judgment dragon loop.wav by zagi2](https://freesound.org/s/219406/) -- License:
+Attribution NonCommercial 4.0
+
+[8-bit Game Over by Euphrosyyn](https://freesound.org/s/442127/) -- License:
+Attribution 4.0
+
+[Grunts.wav by bennychico11](https://freesound.org/s/80438/) -- License:
+Attribution 4.0
+
+[Stick-Swoosh Whoosh by Hitrison](https://freesound.org/s/216675/) -- License:
+Attribution 4.0
+
 `SPDX-License-Identifiers: CC-BY-NC-4.0, CC0-1.0`
