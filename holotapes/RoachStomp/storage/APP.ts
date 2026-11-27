@@ -609,7 +609,7 @@
     h.setColor(3)
       .setFontMonofonto18()
       .setFontAlign(1, 1)
-      .drawString(APP_VERSION, 160, 115);
+      .drawString(APP_VERSION, 450, 300);
 
     h.setColor(0).fillRect(165, 257, 315, 290);
     h.setColor(1)

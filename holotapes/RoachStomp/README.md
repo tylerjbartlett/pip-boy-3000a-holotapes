@@ -11,6 +11,11 @@
 - [Pip-Boy.com](https://www.Pip-Boy.com)
 - [Join the Discord!](https://discord.gg/UKpv9bk5Yj)
 
+**Contributors**
+
+- Artwork and sprites by discord member
+  [@Goji](https://discord.com/users/1548148273674723470). THANK YOU!
+
 ### Description
 
 Radroaches are swarming the vault and all you've got is your trusty boot. Stomp

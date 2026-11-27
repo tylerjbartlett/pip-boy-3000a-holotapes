@@ -2,12 +2,12 @@
   "id": "roachstomp",
   "name": "Roach Stomp",
   "author": "@tylerjbartlett",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Radroaches are swarming the vault and all you've got is your trusty boot. Stomp the roaches and save the vault!",
   "icon": "storage/ROACHSTOMP.png",
   "previews": [
-    "previews/PREVIEW01.png",
-    "previews/PREVIEW02.png",
+    "previews/PREVIEW01.bmp",
+    "previews/PREVIEW02.bmp",
     "previews/CFW-GENERAL.png"
   ],
   "type": "game",
